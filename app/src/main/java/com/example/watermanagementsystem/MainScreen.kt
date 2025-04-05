@@ -1,5 +1,11 @@
 package com.example.watermanagementsystem
 
+import android.content.pm.PackageManager
+import android.os.Build
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,16 +22,21 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.watermanagementsystem.ui.theme.background
 import com.example.watermanagementsystem.ui.theme.blue
@@ -36,9 +47,44 @@ import com.example.watermanagementsystem.ui.theme.red
 import com.example.watermanagementsystem.ui.theme.secondaryBackground
 import java.nio.file.WatchEvent
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@Composable
+fun RequestNotificationPermission() {
+    val context = LocalContext.current
+    val permission = android.Manifest.permission.POST_NOTIFICATIONS
 
+    // Only needed for API 33+
+    val shouldShowPermissionDialog = remember {
+        true
+    }
+
+    val permissionState = remember {
+        mutableStateOf(ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        permissionState.value = isGranted
+        if (isGranted) {
+            Toast.makeText(context, "Permission granted!", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (shouldShowPermissionDialog && !permissionState.value) {
+            launcher.launch(permission)
+        }
+    }
+}
+
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()){
+    RequestNotificationPermission()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -48,11 +94,11 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()){
     ) {
         TopBar()
         Spacer(modifier = Modifier.fillMaxWidth().height(20.dp))
-        StatusComponent(color = blue , value = viewModel.waterLevel.intValue.toString() , title = "Water Level")
+        StatusComponent(color = blue , value = viewModel.waterLevel.floatValue.toString() , title = "Water Level")
         Spacer(modifier = Modifier.fillMaxWidth().height(20.dp))
-        StatusComponent(color = purple, value =viewModel.moistureLevel.intValue.toString() , title = "Moisture Level")
+        StatusComponent(color = purple, value =viewModel.moistureLevel.floatValue.toString() , title = "Moisture Level")
         Spacer(modifier = Modifier.fillMaxWidth().height(20.dp))
-        StatusComponent(color = red , value = if(viewModel.fireStatus.value == "FIRE-DETECTED") "FIRE-DETECTED" else "SAFE" , title = "Fire Status")
+        StatusComponent(color = red , value = if(viewModel.fireStatus.value) "FIRE-DETECTED" else "SAFE" , title = "Fire Status")
         Spacer(modifier = Modifier.fillMaxWidth().height(20.dp))
         ButtonComponent(onButtonClick = { viewModel.toggleExtinguish() } , color = green , text = "Extinguish")
     }

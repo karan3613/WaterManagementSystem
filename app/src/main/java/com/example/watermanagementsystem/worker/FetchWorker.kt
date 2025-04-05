@@ -2,13 +2,10 @@ package com.example.watermanagementsystem.worker
 
 import android.Manifest
 import android.R
-import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import android.util.Log
 import androidx.annotation.RequiresPermission
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Warning
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -18,9 +15,7 @@ import androidx.work.WorkerParameters
 import com.example.watermanagementsystem.api.apiInterface
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withContext
 
 @HiltWorker
@@ -28,7 +23,6 @@ class FetchWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted private val workerParams: WorkerParameters,
     private val api: apiInterface,
-    private val notificationManager: NotificationManager
 ) : CoroutineWorker(context, workerParams){
     //Case-1 where there is fire -> notification
     //Case-2 when the user will will open the app
@@ -40,9 +34,9 @@ class FetchWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         return try {
             val response = withContext(Dispatchers.IO) {
-                api.getFireStatus()
+                api.getData()
             }
-            if(response == "FIRE-DETECTED"){
+            if(response.fire_status){
                 sendNotification()
             }
             Result.success()
@@ -62,7 +56,7 @@ class FetchWorker @AssistedInject constructor(
      val message = "Fire has broken out please quickly extinguish it "
      val desc = "Notifier the user when fire is detected in his farms"
      val notificationManager = NotificationManagerCompat.from(applicationContext)
-     val channel = NotificationChannelCompat.Builder(CHANNEL_ID , NotificationManagerCompat.IMPORTANCE_HIGH)
+        val channel = NotificationChannelCompat.Builder(CHANNEL_ID , NotificationManagerCompat.IMPORTANCE_HIGH)
          .setName(name)
          .setDescription(desc)
          .build()

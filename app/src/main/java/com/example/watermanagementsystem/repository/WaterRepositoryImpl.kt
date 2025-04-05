@@ -2,10 +2,12 @@ package com.example.watermanagementsystem.repository
 
 import android.util.Log
 import androidx.work.Constraints
+import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.example.watermanagementsystem.api.DataModel
 import com.example.watermanagementsystem.api.apiInterface
 import com.example.watermanagementsystem.worker.FetchWorker
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +23,7 @@ class WaterRepositoryImpl @Inject constructor(
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
-        val workRequest = PeriodicWorkRequestBuilder<FetchWorker>(repeatInterval = 1 , repeatIntervalTimeUnit = java.util.concurrent.TimeUnit.MINUTES)
+        val workRequest = PeriodicWorkRequestBuilder<FetchWorker>(repeatInterval = 2 , repeatIntervalTimeUnit = java.util.concurrent.TimeUnit.SECONDS)
             .setConstraints(constraints)
             .build()
         workManager.enqueueUniquePeriodicWork(uniqueWorkName = "fire_notification_work" ,
@@ -29,40 +31,19 @@ class WaterRepositoryImpl @Inject constructor(
             ,workRequest
         )
     }
-    override suspend fun getWaterLevel(): Int {
+
+    override suspend fun getData(): DataModel {
         try {
             val response = withContext(Dispatchers.IO) {
-                api.getWaterLevel()
+                api.getData()
             }
+            Log.d("api" ,"the data is successfully fetched")
+            Log.d("api" , response.toString())
             return response
         }catch (e : Exception){
             Log.d("api" , e.message.toString())
         }
-        return -99
-    }
-
-    override suspend fun getMoistureLevel(): Int {
-        try{
-            val response = withContext(Dispatchers.IO){
-                api.getMoistureLevel()
-            }
-            return response
-        }catch (e : Exception){
-            Log.d("api" , e.message.toString())
-        }
-        return -99
-    }
-
-    override suspend fun getFireStatus(): String {
-        try{
-            val response = withContext(Dispatchers.IO){
-                api.getFireStatus()
-            }
-            return response
-            }catch (e : Exception){
-            Log.d("api" , e.message.toString())
-        }
-        return "error"
+        return DataModel(99f , 99f , false)
     }
 
     override suspend fun extinguish() {
