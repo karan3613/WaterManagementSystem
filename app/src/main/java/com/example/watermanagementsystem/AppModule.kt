@@ -12,14 +12,23 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+     val client =  OkHttpClient.Builder()
+    .connectTimeout(2, TimeUnit.MINUTES)
+    .writeTimeout(2, TimeUnit.MINUTES)
+    .readTimeout(2, TimeUnit.MINUTES)
+    .build();
+
 
     @Provides
     @Singleton
@@ -32,6 +41,7 @@ object AppModule {
     fun provideApiRetrofit(): Retrofit {
         return Retrofit.Builder()
             .baseUrl(API.BASE_URL)
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -48,6 +58,7 @@ object AppModule {
     fun provideMlApiRetrofit(): Retrofit {
         return Retrofit.Builder()
             .baseUrl(API.ML_URL)
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
