@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.watermanagementsystem.api.PredictedModel
+import com.example.watermanagementsystem.api.PredictionModel
 import com.example.watermanagementsystem.repository.WaterRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -18,15 +20,24 @@ class MainViewModel @Inject constructor(
     val waterLevel = mutableFloatStateOf(0f)
     val moistureLevel = mutableFloatStateOf(0f)
     val fireStatus = mutableStateOf(false)
+    val predictedModel = mutableStateOf(PredictedModel())
+    val isLoading = mutableStateOf(false)
 
     init {
         setupPeriodicWork()
         fetchDetails()
+    }
 
+     fun predictMlModel(prediction : PredictionModel){
+        viewModelScope.launch {
+            isLoading.value = true
+            val response = repository.prediction(prediction)
+            predictedModel.value = response
+            isLoading.value = false
+        }
     }
 
     private fun fetchDetails() {
-
             viewModelScope.launch {
                 while (true) {
                     val response = repository.getData()
@@ -43,7 +54,7 @@ class MainViewModel @Inject constructor(
             repository.extinguish()
         }
     }
-    fun setupPeriodicWork(){
+    private fun setupPeriodicWork(){
         viewModelScope.launch {
             repository.setUpPeriodicWork()
         }

@@ -8,13 +8,17 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.watermanagementsystem.api.DataModel
+import com.example.watermanagementsystem.api.PredictedModel
+import com.example.watermanagementsystem.api.PredictionModel
 import com.example.watermanagementsystem.api.apiInterface
+import com.example.watermanagementsystem.api.mlApiInterface
 import com.example.watermanagementsystem.worker.FetchWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class WaterRepositoryImpl @Inject constructor(
+    private val mlApi: mlApiInterface,
     private val api: apiInterface,
     private val workManager: WorkManager
 ) : WaterRepository
@@ -55,5 +59,17 @@ class WaterRepositoryImpl @Inject constructor(
         }catch (e : Exception){
             Log.d("api" , e.message.toString())
         }
+    }
+
+    override suspend fun prediction(predictionModel: PredictionModel): PredictedModel {
+        try {
+            val response = withContext(Dispatchers.IO){
+                mlApi.predict(predictionModel)
+            }
+            return response
+        }catch (e : Exception){
+            Log.d("api" , e.message.toString())
+        }
+        return PredictedModel(prediction =  "THE API HAS ERROR")
     }
 }
