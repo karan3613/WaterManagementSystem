@@ -1,8 +1,6 @@
 package com.example.watermanagementsystem.worker
 
 import android.Manifest
-import android.R
-import android.app.NotificationManager
 import android.content.Context
 import android.util.Log
 import androidx.annotation.RequiresPermission
@@ -12,6 +10,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.watermanagementsystem.R
 import com.example.watermanagementsystem.api.apiInterface
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -33,6 +32,7 @@ class FetchWorker @AssistedInject constructor(
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override suspend fun doWork(): Result {
         return try {
+            Log.d("worker" , "The worker has started")
             val response = withContext(Dispatchers.IO) {
                 api.getData()
             }
@@ -43,34 +43,34 @@ class FetchWorker @AssistedInject constructor(
         }catch(
             e: Exception
         ){
-            Log.d("api" , e.message.toString())
+            Log.d("api", e.message.toString())
             Result.failure()
         }
     }
-
-
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun sendNotification() {
-     val title = "FIRE-DETECTED"
-     val name = "Fire-Notification"
-     val message = "Fire has broken out please quickly extinguish it "
-     val desc = "Notifier the user when fire is detected in his farms"
-     val notificationManager = NotificationManagerCompat.from(applicationContext)
+        Log.d("notification" , "The notification has been started")
+        val title = "FIRE-DETECTED"
+        val name = "Fire-Notification"
+        val message = "Fire has broken out please quickly extinguish it "
+        val desc = "Notifier the user when fire is detected in his farms"
+        val notificationManager = NotificationManagerCompat.from(applicationContext)
         val channel = NotificationChannelCompat.Builder(CHANNEL_ID , NotificationManagerCompat.IMPORTANCE_HIGH)
-         .setName(name)
-         .setDescription(desc)
-         .build()
+            .setName(name)
+            .setDescription(desc)
+            .build()
 
         notificationManager.createNotificationChannel(channel)
         val notification = NotificationCompat.Builder(applicationContext , CHANNEL_ID)
-         .setSmallIcon(R.drawable.ic_dialog_alert)
-         .setContentTitle(title)
-         .setContentText(message)
-         .setPriority(NotificationCompat.PRIORITY_HIGH)
-         .setAutoCancel(true)
-         .build()
+            .setSmallIcon(R.drawable.ic_launcher_background)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .build()
 
-     notificationManager.notify(FIRE_NOTIFICATION_ID, notification)
+        notificationManager.notify(FIRE_NOTIFICATION_ID, notification)
+        Log.d("notification" , "The notification has been sent")
     }
 }
 

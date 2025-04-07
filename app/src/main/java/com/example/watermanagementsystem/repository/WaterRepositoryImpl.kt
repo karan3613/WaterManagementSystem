@@ -1,12 +1,20 @@
 package com.example.watermanagementsystem.repository
 
+import android.Manifest
+import android.content.Context
 import android.util.Log
+import androidx.annotation.RequiresPermission
+import androidx.core.app.NotificationChannelCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.example.watermanagementsystem.R
 import com.example.watermanagementsystem.api.DataModel
 import com.example.watermanagementsystem.api.PredictedModel
 import com.example.watermanagementsystem.api.PredictionModel
@@ -20,7 +28,7 @@ import javax.inject.Inject
 class WaterRepositoryImpl @Inject constructor(
     private val mlApi: mlApiInterface,
     private val api: apiInterface,
-    private val workManager: WorkManager
+    private val workManager: WorkManager ,
 ) : WaterRepository
 {
     override suspend fun setUpPeriodicWork(){

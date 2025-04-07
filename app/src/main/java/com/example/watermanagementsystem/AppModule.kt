@@ -23,12 +23,11 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-     val client =  OkHttpClient.Builder()
+     val client : OkHttpClient =  OkHttpClient.Builder()
     .connectTimeout(2, TimeUnit.MINUTES)
     .writeTimeout(2, TimeUnit.MINUTES)
     .readTimeout(2, TimeUnit.MINUTES)
     .build();
-
 
     @Provides
     @Singleton
@@ -73,4 +72,5 @@ object AppModule {
     fun provideWorkManager(@ApplicationContext context: Context) : WorkManager{
         return WorkManager.getInstance(context)
     }
+
 }

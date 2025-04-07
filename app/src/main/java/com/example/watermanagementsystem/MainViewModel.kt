@@ -1,21 +1,31 @@
 package com.example.watermanagementsystem
 
+import android.Manifest
+import android.content.Context
+import android.util.Log
+import androidx.annotation.RequiresPermission
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.app.NotificationChannelCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.watermanagementsystem.api.PredictedModel
 import com.example.watermanagementsystem.api.PredictionModel
 import com.example.watermanagementsystem.repository.WaterRepository
+import com.example.watermanagementsystem.worker.CHANNEL_ID
+import com.example.watermanagementsystem.worker.FIRE_NOTIFICATION_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val repository: WaterRepository
+    private val repository: WaterRepository ,
 ) : ViewModel(){
     val waterLevel = mutableFloatStateOf(0f)
     val moistureLevel = mutableFloatStateOf(0f)
@@ -37,8 +47,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
+
     private fun fetchDetails() {
-            viewModelScope.launch {
+            viewModelScope.launch{
                 while (true) {
                     val response = repository.getData()
                     waterLevel.floatValue = response.water_level
@@ -47,8 +58,10 @@ class MainViewModel @Inject constructor(
                     delay(1000)
                 }
             }
-
     }
+
+
+
      fun toggleExtinguish(){
         viewModelScope.launch {
             repository.extinguish()

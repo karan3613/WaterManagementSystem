@@ -1,11 +1,15 @@
 package com.example.watermanagementsystem
 
+import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,6 +48,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationChannelCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.watermanagementsystem.api.PredictionModel
@@ -54,6 +61,8 @@ import com.example.watermanagementsystem.ui.theme.lineColor
 import com.example.watermanagementsystem.ui.theme.purple
 import com.example.watermanagementsystem.ui.theme.red
 import com.example.watermanagementsystem.ui.theme.secondaryBackground
+import com.example.watermanagementsystem.worker.CHANNEL_ID
+import com.example.watermanagementsystem.worker.FIRE_NOTIFICATION_ID
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -92,7 +101,13 @@ fun RequestNotificationPermission() {
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()){
+    val context = LocalContext.current
     RequestNotificationPermission()
+    LaunchedEffect(viewModel.fireStatus.value){
+        if(viewModel.fireStatus.value && PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context , android.Manifest.permission.POST_NOTIFICATIONS)){
+            sendNotification(context)
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -377,4 +392,30 @@ fun TopBar() {
             thickness = 2.dp
         )
     }
+}
+
+@RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+private fun sendNotification(context : Context) {
+    Log.d("notification" , "The notification has been started")
+    val title = "FIRE-DETECTED"
+    val name = "Fire-Notification"
+    val message = "Fire has broken out please quickly extinguish it "
+    val desc = "Notifier the user when fire is detected in his farms"
+    val notificationManager = NotificationManagerCompat.from(context)
+    val channel = NotificationChannelCompat.Builder(CHANNEL_ID , NotificationManagerCompat.IMPORTANCE_HIGH)
+        .setName(name)
+        .setDescription(desc)
+        .build()
+
+    notificationManager.createNotificationChannel(channel)
+    val notification = NotificationCompat.Builder(context , CHANNEL_ID)
+        .setSmallIcon(R.drawable.ic_launcher_background)
+        .setContentTitle(title)
+        .setContentText(message)
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setAutoCancel(true)
+        .build()
+
+    notificationManager.notify(FIRE_NOTIFICATION_ID, notification)
+    Log.d("notification" , "The notification has been sent")
 }
