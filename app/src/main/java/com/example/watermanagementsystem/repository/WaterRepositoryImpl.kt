@@ -1,23 +1,16 @@
 package com.example.watermanagementsystem.repository
 
-import android.Manifest
-import android.content.Context
 import android.util.Log
-import androidx.annotation.RequiresPermission
-import androidx.core.app.NotificationChannelCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.Constraints
-import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.watermanagementsystem.R
 import com.example.watermanagementsystem.api.DataModel
 import com.example.watermanagementsystem.api.PredictedModel
 import com.example.watermanagementsystem.api.PredictionModel
+import com.example.watermanagementsystem.api.TapModel
 import com.example.watermanagementsystem.api.apiInterface
 import com.example.watermanagementsystem.api.mlApiInterface
 import com.example.watermanagementsystem.worker.FetchWorker
@@ -35,7 +28,7 @@ class WaterRepositoryImpl @Inject constructor(
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
-        val workRequest = PeriodicWorkRequestBuilder<FetchWorker>(repeatInterval = 2 , repeatIntervalTimeUnit = java.util.concurrent.TimeUnit.SECONDS)
+        val workRequest = PeriodicWorkRequestBuilder<FetchWorker>(repeatInterval = 15 , repeatIntervalTimeUnit = java.util.concurrent.TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
         workManager.enqueueUniquePeriodicWork(uniqueWorkName = "fire_notification_work" ,
@@ -58,15 +51,17 @@ class WaterRepositoryImpl @Inject constructor(
         return DataModel(99f , 99f , false)
     }
 
-    override suspend fun extinguish() {
+    override suspend fun extinguish()  : TapModel{
         try{
             val response = withContext(Dispatchers.IO){
                 api.extinguish()
             }
-            return
+            Log.d("api" , "THE TAP FUNCTION IS WORKING")
+            return response
         }catch (e : Exception){
             Log.d("api" , e.message.toString())
         }
+        return TapModel(false)
     }
 
     override suspend fun prediction(predictionModel: PredictionModel): PredictedModel {

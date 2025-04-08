@@ -5,3 +5,7 @@ data class DataModel(
     val moisture_level: Float,
     val fire_status: Boolean
 )
+
+data class TapModel(
+    val tap_status : Boolean
+)

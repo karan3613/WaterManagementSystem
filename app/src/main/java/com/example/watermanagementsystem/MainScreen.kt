@@ -3,6 +3,8 @@ package com.example.watermanagementsystem
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.health.connect.datatypes.units.Length
+import android.icu.text.DisplayContext.LENGTH_SHORT
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
@@ -45,7 +47,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationChannelCompat
@@ -133,7 +134,12 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()){
         Spacer(modifier = Modifier
             .fillMaxWidth()
             .height(20.dp))
-        ButtonComponent(onButtonClick = { viewModel.toggleExtinguish() } , color = green , text = "Extinguish")
+        ButtonComponent(onButtonClick = {
+            viewModel.toggleExtinguish()
+             }
+            , color = green , text = "TOGGLE TAP"
+        )
+
         Spacer(modifier = Modifier
             .fillMaxWidth()
             .height(20.dp))

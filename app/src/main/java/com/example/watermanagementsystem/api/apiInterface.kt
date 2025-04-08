@@ -9,5 +9,5 @@ interface apiInterface {
     suspend fun getData(): DataModel
 
     @POST(API.EXTINGUISH_ENDPOINT)
-    suspend fun extinguish()
+    suspend fun extinguish() : TapModel
 }

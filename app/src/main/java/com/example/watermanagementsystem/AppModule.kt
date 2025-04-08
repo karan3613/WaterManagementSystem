@@ -1,6 +1,7 @@
 package com.example.watermanagementsystem
 
 import android.content.Context
+import androidx.lifecycle.ViewModel
 import androidx.work.WorkManager
 import com.example.watermanagementsystem.api.apiInterface
 import com.example.watermanagementsystem.api.mlApiInterface
@@ -27,7 +28,7 @@ object AppModule {
     .connectTimeout(2, TimeUnit.MINUTES)
     .writeTimeout(2, TimeUnit.MINUTES)
     .readTimeout(2, TimeUnit.MINUTES)
-    .build();
+    .build()
 
     @Provides
     @Singleton
@@ -63,8 +64,14 @@ object AppModule {
     }
 
     @Provides
+    @Singleton
     fun provideWaterRepository(mlApi : mlApiInterface , api : apiInterface , workManager: WorkManager) : WaterRepository{
         return WaterRepositoryImpl(mlApi , api, workManager)
+    }
+
+    @Provides
+    fun provideViewModel(repository: WaterRepository , @ApplicationContext context: Context) : MainViewModel {
+        return MainViewModel(repository , context)
     }
 
     @Provides
@@ -72,5 +79,4 @@ object AppModule {
     fun provideWorkManager(@ApplicationContext context: Context) : WorkManager{
         return WorkManager.getInstance(context)
     }
-
 }
