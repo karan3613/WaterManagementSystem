@@ -1,4 +1,4 @@
-package com.example.watermanagementsystem.api
+package com.example.watermanagementsystem.model
 
 data class PredictionModel(
     val PH : Float = 7.38f ,

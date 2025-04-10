@@ -1,10 +1,8 @@
-package com.example.watermanagementsystem
+package com.example.watermanagementsystem.screen
 
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.health.connect.datatypes.units.Length
-import android.icu.text.DisplayContext.LENGTH_SHORT
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
@@ -31,6 +29,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,7 +53,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.watermanagementsystem.api.PredictionModel
+import com.example.watermanagementsystem.MainViewModel
+import com.example.watermanagementsystem.R
+import com.example.watermanagementsystem.model.PredictionModel
 import com.example.watermanagementsystem.ui.theme.background
 import com.example.watermanagementsystem.ui.theme.blue
 import com.example.watermanagementsystem.ui.theme.green
@@ -69,7 +70,7 @@ import com.example.watermanagementsystem.worker.FIRE_NOTIFICATION_ID
 @Composable
 fun RequestNotificationPermission() {
     val context = LocalContext.current
-    val permission = android.Manifest.permission.POST_NOTIFICATIONS
+    val permission = Manifest.permission.POST_NOTIFICATIONS
 
     // Only needed for API 33+
     val shouldShowPermissionDialog = remember {
@@ -105,7 +106,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()){
     val context = LocalContext.current
     RequestNotificationPermission()
     LaunchedEffect(viewModel.fireStatus.value){
-        if(viewModel.fireStatus.value && PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context , android.Manifest.permission.POST_NOTIFICATIONS)){
+        if(viewModel.fireStatus.value && PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context , Manifest.permission.POST_NOTIFICATIONS)){
             sendNotification(context)
         }
     }
@@ -117,33 +118,47 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()){
             .padding(15.dp) ,
         horizontalAlignment =  Alignment.CenterHorizontally ,
         verticalArrangement = Arrangement.Center
-    ) {
-        TopBar()
+    ){
+        TopBar(
+            currentLanguage = viewModel.isHindiSelected.value ,
+            onLanguageChange = {
+                viewModel.isHindiSelected.value = !viewModel.isHindiSelected.value
+            }
+        )
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth() ,
+            color = lineColor ,
+            thickness = 2.dp
+        )
         Spacer(modifier = Modifier
             .fillMaxWidth()
             .height(20.dp))
-        StatusComponent(color = blue , value = viewModel.waterLevel.floatValue.toString() , title = "Water Level")
+        StatusComponent(color = blue , value = viewModel.waterLevel.floatValue.toString() , title = if(viewModel.isHindiSelected.value)"जल स्तर" else "ਪਾਣੀ ਦੇ ਪੱਧਰ")
         Spacer(modifier = Modifier
             .fillMaxWidth()
             .height(20.dp))
-        StatusComponent(color = purple, value =viewModel.moistureLevel.floatValue.toString() , title = "Moisture Level")
+        StatusComponent(color = purple, value = viewModel.moistureLevel.floatValue.toString() , title = if(viewModel.isHindiSelected.value)"नमी स्तर" else "ਨਮੀ ਦੇ ਪੱਧਰ")
         Spacer(modifier = Modifier
             .fillMaxWidth()
             .height(20.dp))
-        StatusComponent(color = red , value = if(viewModel.fireStatus.value) "FIRE-DETECTED" else "SAFE" , title = "Fire Status")
+        StatusComponent(color = red ,
+            value = if(viewModel.fireStatus.value)
+                if(viewModel.isHindiSelected.value) "आग लग गई" else "ਅੱਗ ਦਾ ਪਤਾ ਲੱਗਾ ਹੈ"
+            else
+                if (viewModel.isHindiSelected.value) "सुरक्षित" else "ਸੁਰੱਖਿਅਤ" ,
+            title = if(viewModel.isHindiSelected.value) "आग की स्थिति" else "ਅੱਗ ਦੀ ਸਥਿਤੀ")
         Spacer(modifier = Modifier
             .fillMaxWidth()
             .height(20.dp))
         ButtonComponent(onButtonClick = {
             viewModel.toggleExtinguish()
              }
-            , color = green , text = "TOGGLE TAP"
+            , color = green , text = if(viewModel.isHindiSelected.value) "नल खोलें" else "ਟੂਟੀ ਖੋਲ੍ਹੋ"
         )
 
         Spacer(modifier = Modifier
             .fillMaxWidth()
             .height(20.dp))
-        MlComponents(viewModel)
     }
 }
 
@@ -266,7 +281,9 @@ fun MlComponents(viewModel: MainViewModel) {
         fontWeight = FontWeight.SemiBold ,
         fontStyle = FontStyle.Normal ,
         textAlign = TextAlign.Center,
-        modifier = Modifier.fillMaxWidth().height(60.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
     )
 }
 
@@ -277,7 +294,10 @@ fun InputComponent(
     label : String
 ){
     OutlinedTextField(
-        modifier = Modifier.fillMaxWidth().height(90.dp).padding(top = 10.dp , bottom = 10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(90.dp)
+            .padding(top = 10.dp, bottom = 10.dp),
         value =value,
         onValueChange = {
             onValueChange(it)
@@ -384,18 +404,34 @@ fun StatusComponent(color : Color = red , value : String = "FIRE-DETECTED" , tit
 
 
 @Composable
-fun TopBar() {
-    Column(
+fun TopBar(
+    currentLanguage : Boolean ,
+    onLanguageChange : () -> Unit
+) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(40.dp) ,
-        horizontalAlignment = Alignment.CenterHorizontally ,
-        verticalArrangement = Arrangement.Bottom
+        verticalAlignment = Alignment.CenterVertically ,
+        horizontalArrangement = Arrangement.End
     ) {
-        HorizontalDivider(
-            modifier = Modifier.fillMaxWidth() ,
-            color = lineColor ,
-            thickness = 2.dp
+        Text(
+            text = "Punjabi" ,
+            color = Color.White ,
+            fontSize = 20.sp ,
+            fontWeight = FontWeight.SemiBold
+        )
+        Switch(
+            checked = currentLanguage ,
+            onCheckedChange = {
+                onLanguageChange()
+            }
+        )
+        Text(
+            text = "Hindi" ,
+            color = Color.White ,
+            fontSize = 20.sp ,
+            fontWeight = FontWeight.SemiBold
         )
     }
 }

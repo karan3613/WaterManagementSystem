@@ -1,4 +1,4 @@
-package com.example.watermanagementsystem.api
+package com.example.watermanagementsystem.model
 
 data class DataModel(
     val water_level: Float,

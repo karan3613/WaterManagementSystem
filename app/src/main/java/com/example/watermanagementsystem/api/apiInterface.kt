@@ -1,13 +1,14 @@
 package com.example.watermanagementsystem.api
 
 import com.example.watermanagementsystem.constant.API
+import com.example.watermanagementsystem.model.DataModel
+import com.example.watermanagementsystem.model.TapModel
 import retrofit2.http.GET
-import retrofit2.http.POST
 
 interface apiInterface {
     @GET(API.DATA_ENDPOINT)
     suspend fun getData(): DataModel
 
-    @POST(API.EXTINGUISH_ENDPOINT)
+    @GET(API.EXTINGUISH_ENDPOINT)
     suspend fun extinguish() : TapModel
 }
