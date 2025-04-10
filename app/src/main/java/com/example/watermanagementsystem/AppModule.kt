@@ -3,6 +3,7 @@ package com.example.watermanagementsystem
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.work.WorkManager
+import com.example.watermanagementsystem.api.advancedMlApiInterface
 import com.example.watermanagementsystem.api.apiInterface
 import com.example.watermanagementsystem.api.mlApiInterface
 import com.example.watermanagementsystem.constant.API
@@ -65,8 +66,24 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideWaterRepository(mlApi : mlApiInterface , api : apiInterface , workManager: WorkManager) : WaterRepository{
-        return WaterRepositoryImpl(mlApi , api, workManager)
+    fun provideAdvancedMlApiInterface(@Named("ADVANCED_ML_RETROFIT") retrofit : Retrofit): advancedMlApiInterface {
+        return retrofit.create(advancedMlApiInterface::class.java)
+    }
+
+    @Provides
+    @Singleton
+    @Named("ADVANCED_ML_RETROFIT")
+    fun provideAdvancedMlApiRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(API.ADVANCED_ML_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideWaterRepository(mlApi : mlApiInterface , api : apiInterface , workManager: WorkManager , advancedMlApiInterface: advancedMlApiInterface , @ApplicationContext context: Context) : WaterRepository{
+        return WaterRepositoryImpl(mlApi , api,  workManager , advancedMlApiInterface , context)
     }
 
     @Provides

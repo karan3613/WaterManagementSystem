@@ -19,16 +19,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,9 +59,11 @@ import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.watermanagementsystem.MainViewModel
 import com.example.watermanagementsystem.R
+import com.example.watermanagementsystem.constant.APPROUTES
 import com.example.watermanagementsystem.model.PredictionModel
 import com.example.watermanagementsystem.ui.theme.background
 import com.example.watermanagementsystem.ui.theme.blue
@@ -102,7 +111,7 @@ fun RequestNotificationPermission() {
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun MainScreen(viewModel: MainViewModel = hiltViewModel()){
+fun MainScreen(navController : NavHostController , viewModel: MainViewModel){
     val context = LocalContext.current
     RequestNotificationPermission()
     LaunchedEffect(viewModel.fireStatus.value){
@@ -110,56 +119,122 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()){
             sendNotification(context)
         }
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(background)
-            .verticalScroll(rememberScrollState())
-            .padding(15.dp) ,
-        horizontalAlignment =  Alignment.CenterHorizontally ,
-        verticalArrangement = Arrangement.Center
-    ){
-        TopBar(
-            currentLanguage = viewModel.isHindiSelected.value ,
-            onLanguageChange = {
-                viewModel.isHindiSelected.value = !viewModel.isHindiSelected.value
-            }
-        )
-        HorizontalDivider(
-            modifier = Modifier.fillMaxWidth() ,
-            color = lineColor ,
-            thickness = 2.dp
-        )
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .height(20.dp))
-        StatusComponent(color = blue , value = viewModel.waterLevel.floatValue.toString() , title = if(viewModel.isHindiSelected.value)"जल स्तर" else "ਪਾਣੀ ਦੇ ਪੱਧਰ")
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .height(20.dp))
-        StatusComponent(color = purple, value = viewModel.moistureLevel.floatValue.toString() , title = if(viewModel.isHindiSelected.value)"नमी स्तर" else "ਨਮੀ ਦੇ ਪੱਧਰ")
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .height(20.dp))
-        StatusComponent(color = red ,
-            value = if(viewModel.fireStatus.value)
-                if(viewModel.isHindiSelected.value) "आग लग गई" else "ਅੱਗ ਦਾ ਪਤਾ ਲੱਗਾ ਹੈ"
-            else
-                if (viewModel.isHindiSelected.value) "सुरक्षित" else "ਸੁਰੱਖਿਅਤ" ,
-            title = if(viewModel.isHindiSelected.value) "आग की स्थिति" else "ਅੱਗ ਦੀ ਸਥਿਤੀ")
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .height(20.dp))
-        ButtonComponent(onButtonClick = {
-            viewModel.toggleExtinguish()
-             }
-            , color = green , text = if(viewModel.isHindiSelected.value) "नल खोलें" else "ਟੂਟੀ ਖੋਲ੍ਹੋ"
-        )
-
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .height(20.dp))
+    Scaffold {padding->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(background)
+                .verticalScroll(rememberScrollState())
+                .padding(padding)
+                .padding(start = 10.dp , end = 10.dp),
+            horizontalAlignment =  Alignment.CenterHorizontally ,
+        ){
+            TopBar(
+                currentLanguage = viewModel.isHindiSelected.value ,
+                onLanguageChange = {
+                    viewModel.isHindiSelected.value = !viewModel.isHindiSelected.value
+                }
+            )
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth() ,
+                color = lineColor ,
+                thickness = 2.dp
+            )
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .height(20.dp))
+            StatusComponent(color = blue , value = viewModel.waterLevel.floatValue.toString() , title = if(viewModel.isHindiSelected.value)"जल स्तर" else "ਪਾਣੀ ਦੇ ਪੱਧਰ")
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .height(20.dp))
+            StatusComponent(color = purple, value = viewModel.moistureLevel.floatValue.toString() , title = if(viewModel.isHindiSelected.value)"नमी स्तर" else "ਨਮੀ ਦੇ ਪੱਧਰ")
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .height(20.dp))
+            StatusComponent(color = red ,
+                value = if(viewModel.fireStatus.value)
+                    if(viewModel.isHindiSelected.value) "आग लग गई" else "ਅੱਗ ਦਾ ਪਤਾ ਲੱਗਾ ਹੈ"
+                else
+                    if (viewModel.isHindiSelected.value) "सुरक्षित" else "ਸੁਰੱਖਿਅਤ" ,
+                title = if(viewModel.isHindiSelected.value) "आग की स्थिति" else "ਅੱਗ ਦੀ ਸਥਿਤੀ")
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .height(20.dp))
+//        ButtonComponent(onButtonClick = {
+//            viewModel.toggleExtinguish()
+//             }
+//            , color = green , text = if(viewModel.isHindiSelected.value) "नल खोलें" else "ਟੂਟੀ ਖੋਲ੍ਹੋ"
+//        )
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .height(20.dp))
+          DiseaseDetectionComponent(navController , viewModel)
+          ChatBotComponent(navController , viewModel)
+//          MlComponents(viewModel)
+        }
     }
+}
+
+@Composable
+fun ChatBotComponent(navController: NavController, viewModel : MainViewModel) {
+    Row(
+        modifier = Modifier.fillMaxWidth().height(100.dp).padding(10.dp) ,
+        verticalAlignment = Alignment.CenterVertically ,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        IconButton(
+            onClick = {
+                navController.navigate(APPROUTES.CHATBOT_SCREEN)
+            }
+        ) {
+            Icon(
+                Icons.Default.Person ,
+                contentDescription = "chatbot" ,
+                tint = secondaryBackground ,
+                modifier = Modifier.size(50.dp)
+            )
+        }
+    }
+    Spacer(modifier = Modifier
+        .fillMaxWidth()
+        .height(10.dp))
+    Text(
+        text = if(viewModel.isHindiSelected.value) "प्रश्न पूछें" else "ਸਵਾਲ ਪੁੱਛੋ" ,
+        color = Color.White,
+        fontSize = 25.sp ,
+        fontWeight = FontWeight.SemiBold
+    )
+}
+
+@Composable
+fun DiseaseDetectionComponent(navController: NavHostController, viewModel : MainViewModel) {
+    Row(
+        modifier = Modifier.fillMaxWidth().height(100.dp).padding(10.dp) ,
+        verticalAlignment = Alignment.CenterVertically ,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        IconButton(
+            onClick = {
+                navController.navigate(APPROUTES.CAMERA_SCREEN)
+            }
+        ) {
+            Icon(
+                Icons.Default.Star,
+                contentDescription = "Disease Detection",
+                tint = secondaryBackground,
+                modifier = Modifier.size(50.dp)
+            )
+        }
+    }
+    Spacer(modifier = Modifier
+        .fillMaxWidth()
+        .height(10.dp))
+    Text(
+        text = if(viewModel.isHindiSelected.value) "रोग पहचानें" else "ਬਿਮਾਰੀ ਨੂੰ ਪਛਾਣੋ" ,
+        color = Color.White ,
+        fontSize = 25.sp ,
+        fontWeight = FontWeight.SemiBold
+    )
 }
 
 @Composable

@@ -23,8 +23,8 @@ interface advancedMlApiInterface{
     @Multipart
     @POST(API.ADVANCED_ML_DISEASE_ENDPOINT)
     suspend fun getDiseaseResponse(
-        @Part("image") image : MultipartBody.Part ,
-        @Part("language") language : String
+        @Part image : MultipartBody.Part ,
+        @Part("lang") lang : String
     ) : DiseaseResponse
 
     @POST(API.ADVANCED_ML_WEATHER_ENDPOINT)

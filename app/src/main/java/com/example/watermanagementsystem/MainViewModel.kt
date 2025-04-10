@@ -43,8 +43,8 @@ class MainViewModel @Inject constructor(
     val isClicked = mutableStateOf(false)
     private val imageFile = File(context.filesDir , "my_image.jepg")
 
-    private val chatbotResponse = mutableStateOf(ChatbotResponse())
-    private val diseaseResponse = mutableStateOf(DiseaseResponse())
+    val chatbotResponse = mutableStateOf(ChatbotResponse())
+    val diseaseResponse = mutableStateOf(DiseaseResponse())
 
     init {
         setupPeriodicWork()
@@ -58,7 +58,7 @@ class MainViewModel @Inject constructor(
                imageFile= imageFile ,
                language =  if(isHindiSelected.value) "Hindi" else "Punjabi")
            diseaseResponse.value = response
-            isLoading.value = true
+            isLoading.value = false
         }
     }
 
@@ -70,7 +70,7 @@ class MainViewModel @Inject constructor(
                 language = if(isHindiSelected.value) "Hindi" else "Punjabi"
             )
             chatbotResponse.value = response
-            isLoading.value = true
+            isLoading.value = false
         }
     }
 
@@ -88,7 +88,7 @@ class MainViewModel @Inject constructor(
                 while (true) {
                     val response = repository.getData()
                     waterLevel.floatValue = response.water_level
-                    moistureLevel.floatValue = response.moisture_level
+                    moistureLevel.floatValue = 100f - response.moisture_level
                     fireStatus.value = response.fire_status
                     delay(1000)
                 }

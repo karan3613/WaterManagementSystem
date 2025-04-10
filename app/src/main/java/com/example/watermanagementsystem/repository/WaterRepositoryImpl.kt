@@ -59,7 +59,7 @@ class WaterRepositoryImpl @Inject constructor(
         }catch (e : Exception){
             Log.d("api" , e.message.toString())
         }
-        return DataModel(99f , 99f , false)
+        return DataModel(0f , 100f , false)
     }
 
     override suspend fun extinguish()  : TapModel{
@@ -102,7 +102,7 @@ class WaterRepositoryImpl @Inject constructor(
                         imageFile.name,
                         imageFile.asRequestBody()
                     ) ,
-                    language = language
+                    lang = language
                 )
             }
             return response
