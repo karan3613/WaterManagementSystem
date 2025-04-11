@@ -4,6 +4,8 @@ import com.example.watermanagementsystem.constant.API
 import com.example.watermanagementsystem.model.ChatbotRequest
 import com.example.watermanagementsystem.model.ChatbotResponse
 import com.example.watermanagementsystem.model.DiseaseResponse
+import com.example.watermanagementsystem.model.PredictedModel
+import com.example.watermanagementsystem.model.PredictionModel
 import com.example.watermanagementsystem.model.WeatherRequest
 import com.example.watermanagementsystem.model.WeatherResponse
 import okhttp3.MultipartBody
@@ -27,8 +29,8 @@ interface advancedMlApiInterface{
         @Part("lang") lang : String
     ) : DiseaseResponse
 
-    @POST(API.ADVANCED_ML_WEATHER_ENDPOINT)
-    suspend fun getWeatherReport(
-        @Body weatherRequest : WeatherRequest
-    ) : WeatherResponse
+    @POST(API.PREDICTION_ENDPOINT)
+    suspend fun predict(
+        @Body predictionModel: PredictionModel
+    ): PredictedModel
 }

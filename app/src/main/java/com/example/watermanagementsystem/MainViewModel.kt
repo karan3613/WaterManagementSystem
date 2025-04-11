@@ -99,11 +99,6 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             val response = repository.extinguish()
             tapStatus.value = response.tap_status
-//            Toast.makeText(
-//                context ,
-//                if(tapStatus.value) "TAP IS ON" else "TAP IS OFF" ,
-//                Toast.LENGTH_SHORT
-//            ).show()
         }
     }
 

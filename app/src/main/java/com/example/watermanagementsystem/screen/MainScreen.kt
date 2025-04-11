@@ -5,11 +5,9 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -48,7 +46,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -75,45 +75,11 @@ import com.example.watermanagementsystem.ui.theme.secondaryBackground
 import com.example.watermanagementsystem.worker.CHANNEL_ID
 import com.example.watermanagementsystem.worker.FIRE_NOTIFICATION_ID
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-@Composable
-fun RequestNotificationPermission() {
-    val context = LocalContext.current
-    val permission = Manifest.permission.POST_NOTIFICATIONS
-
-    // Only needed for API 33+
-    val shouldShowPermissionDialog = remember {
-        true
-    }
-
-    val permissionState = remember {
-        mutableStateOf(ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED)
-    }
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        permissionState.value = isGranted
-        if (isGranted) {
-            Toast.makeText(context, "Permission granted!", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        if (shouldShowPermissionDialog && !permissionState.value) {
-            launcher.launch(permission)
-        }
-    }
-}
-
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun MainScreen(navController : NavHostController , viewModel: MainViewModel){
     val context = LocalContext.current
-    RequestNotificationPermission()
     LaunchedEffect(viewModel.fireStatus.value){
         if(viewModel.fireStatus.value && PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context , Manifest.permission.POST_NOTIFICATIONS)){
             sendNotification(context)
@@ -160,17 +126,17 @@ fun MainScreen(navController : NavHostController , viewModel: MainViewModel){
             Spacer(modifier = Modifier
                 .fillMaxWidth()
                 .height(20.dp))
-//        ButtonComponent(onButtonClick = {
-//            viewModel.toggleExtinguish()
-//             }
-//            , color = green , text = if(viewModel.isHindiSelected.value) "नल खोलें" else "ਟੂਟੀ ਖੋਲ੍ਹੋ"
-//        )
+        ButtonComponent(onButtonClick = {
+            viewModel.toggleExtinguish()
+             }
+            , color = green , text = if(viewModel.isHindiSelected.value) "नल खोलें" else "ਟੂਟੀ ਖੋਲ੍ਹੋ"
+        )
             Spacer(modifier = Modifier
                 .fillMaxWidth()
                 .height(20.dp))
           DiseaseDetectionComponent(navController , viewModel)
           ChatBotComponent(navController , viewModel)
-//          MlComponents(viewModel)
+          MlComponents(viewModel)
         }
     }
 }
@@ -192,6 +158,13 @@ fun ChatBotComponent(navController: NavController, viewModel : MainViewModel) {
                 contentDescription = "chatbot" ,
                 tint = secondaryBackground ,
                 modifier = Modifier.size(50.dp)
+            )
+            Image(
+                painterResource(R.drawable.chatbot) ,
+                contentDescription = "camera" ,
+                modifier = Modifier.size(50.dp) ,
+                contentScale = ContentScale.FillBounds ,
+                alignment = Alignment.Center
             )
         }
     }
@@ -218,11 +191,18 @@ fun DiseaseDetectionComponent(navController: NavHostController, viewModel : Main
                 navController.navigate(APPROUTES.CAMERA_SCREEN)
             }
         ) {
-            Icon(
-                Icons.Default.Star,
-                contentDescription = "Disease Detection",
-                tint = secondaryBackground,
-                modifier = Modifier.size(50.dp)
+//            Icon(
+//                Icons.Default.Star,
+//                contentDescription = "Disease Detection",
+//                tint = secondaryBackground,
+//                modifier = Modifier.size(50.dp)
+//            )
+            Image(
+                painterResource(R.drawable.camera) ,
+                contentDescription = "camera" ,
+                modifier = Modifier.size(50.dp) ,
+                contentScale = ContentScale.FillBounds ,
+                alignment = Alignment.Center
             )
         }
     }

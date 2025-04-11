@@ -2,7 +2,11 @@ package com.example.watermanagementsystem.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,11 +28,12 @@ import com.example.watermanagementsystem.ui.theme.red
 
 @Composable
 fun CAMERA_RESULT_SCREEN(navController : NavHostController , viewModel : MainViewModel){
+
     LaunchedEffect(Unit) {
         viewModel.predictDisease()
     }
     Box(
-        modifier = Modifier.fillMaxSize().background(background) ,
+        modifier = Modifier.fillMaxSize().background(background).padding(20.dp) ,
         contentAlignment = Alignment.Center
     ){
         if(viewModel.isLoading.value){
@@ -38,13 +43,19 @@ fun CAMERA_RESULT_SCREEN(navController : NavHostController , viewModel : MainVie
                 strokeWidth = 3.dp
             )
         }else{
-            Text(
-                text = viewModel.diseaseResponse.value.diseaseInfo ,
-                color = green ,
-                textAlign = TextAlign.Center ,
-                fontSize = 22.sp ,
-                fontWeight = FontWeight.Normal
-            )
+            Column(
+                modifier = Modifier.fillMaxSize().background(background).verticalScroll(
+                    rememberScrollState()
+                ) ,
+            ){
+                Text(
+                    text = viewModel.diseaseResponse.value.diseaseInfo ,
+                    color = green ,
+                    textAlign = TextAlign.Center ,
+                    fontSize = 20.sp ,
+                    fontWeight = FontWeight.Normal
+                )
+            }
         }
     }
 }

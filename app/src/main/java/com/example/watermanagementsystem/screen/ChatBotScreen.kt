@@ -6,13 +6,17 @@ import android.speech.RecognizerIntent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,12 +29,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.watermanagementsystem.MainViewModel
+import com.example.watermanagementsystem.R
 import com.example.watermanagementsystem.ui.theme.background
 import com.example.watermanagementsystem.ui.theme.green
 import java.util.Locale
@@ -72,10 +79,17 @@ fun ChatbotScreen(viewModel: MainViewModel){
                         launcher.launch(intent)
                     }
                 ) {
-                    androidx.compose.material3.Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp)
+//                    androidx.compose.material3.Icon(
+//                        imageVector = Icons.Default.Info,
+//                        contentDescription = null,
+//                        modifier = Modifier.size(48.dp)
+//                    )
+                    Image(
+                        painterResource(R.drawable.mic) ,
+                        contentDescription = "camera" ,
+                        modifier = Modifier.size(50.dp) ,
+                        contentScale = ContentScale.FillBounds ,
+                        alignment = Alignment.Center
                     )
                 }
             }
@@ -86,6 +100,9 @@ fun ChatbotScreen(viewModel: MainViewModel){
                 .fillMaxSize()
                 .background(background)
                 .padding(it)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally ,
+            verticalArrangement = Arrangement.Center
         ){
             if(viewModel.isLoading.value){
                 CircularProgressIndicator(
@@ -99,7 +116,7 @@ fun ChatbotScreen(viewModel: MainViewModel){
                         if(viewModel.isHindiSelected.value) "नीचे दिए गए बटन का उपयोग करके प्रश्न पूछें" else "ਹੇਠਾਂ ਦਿੱਤੇ ਬਟਨ ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਇੱਕ ਸਵਾਲ ਪੁੱਛੋ।" ,
                         color = green ,
                         fontWeight = FontWeight.Normal,
-                        fontSize = 22.sp ,
+                        fontSize = 20.sp ,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -107,7 +124,8 @@ fun ChatbotScreen(viewModel: MainViewModel){
                     viewModel.chatbotResponse.value.answer ,
                     color = green ,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 22.sp
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp
                 )
             }
         }

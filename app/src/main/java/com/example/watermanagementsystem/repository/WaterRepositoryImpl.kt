@@ -13,7 +13,6 @@ import com.example.watermanagementsystem.model.PredictedModel
 import com.example.watermanagementsystem.model.PredictionModel
 import com.example.watermanagementsystem.model.TapModel
 import com.example.watermanagementsystem.api.apiInterface
-import com.example.watermanagementsystem.api.mlApiInterface
 import com.example.watermanagementsystem.constant.API
 import com.example.watermanagementsystem.model.ChatbotRequest
 import com.example.watermanagementsystem.model.ChatbotResponse
@@ -28,11 +27,9 @@ import java.io.File
 import javax.inject.Inject
 
 class WaterRepositoryImpl @Inject constructor(
-    private val mlApi: mlApiInterface,
     private val api: apiInterface,
     private val workManager: WorkManager ,
-    private val advancedMlApi: advancedMlApiInterface ,
-    @ApplicationContext private val context : Context
+    private val advancedMlApi: advancedMlApiInterface
 ) : WaterRepository
 {
     override suspend fun setUpPeriodicWork(){
@@ -78,7 +75,7 @@ class WaterRepositoryImpl @Inject constructor(
     override suspend fun prediction(predictionModel: PredictionModel): PredictedModel {
         try {
             val response = withContext(Dispatchers.IO){
-                mlApi.predict(predictionModel)
+                advancedMlApi.predict(predictionModel)
             }
             return response
         }catch (e : Exception){

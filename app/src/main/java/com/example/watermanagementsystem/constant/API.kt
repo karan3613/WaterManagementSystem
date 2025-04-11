@@ -2,13 +2,11 @@ package com.example.watermanagementsystem.constant
 
 object API {
     const val BASE_URL = "http://192.168.221.104/"
-    const val ML_URL = "https://ecbd-2401-4900-4174-5dde-15aa-b0b2-2f54-d9ef.ngrok-free.app/"
     const val DATA_ENDPOINT = "data"
-    const val ADVANCED_ML_URL = "https://754a-117-250-28-101.ngrok-free.app/"
+    const val ADVANCED_ML_URL = "https://a507-2409-40d1-6-3405-8cb4-39d7-a9f9-5c11.ngrok-free.app/"
     const val ADVANCED_ML_CHATBOT_ENDPOINT = "chatbot"
     const val ADVANCED_ML_DISEASE_ENDPOINT = "disease"
-    const val ADVANCED_ML_WEATHER_ENDPOINT = "weather"
     const val PREDICTION_ENDPOINT = "predict"
-    const val EXTINGUISH_ENDPOINT = "extinguish"
+    const val EXTINGUISH_ENDPOINT = "tapopen"
     const val TYPE_IMAGE = "image"
 }
